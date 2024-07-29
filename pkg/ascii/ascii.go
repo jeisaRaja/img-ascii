@@ -1,36 +1,27 @@
-package main
+package ascii
 
 import (
 	"fmt"
 	"image"
-  _ "image/jpeg"
-  _ "image/png"
 	"image/color"
-	"os"
+	_ "image/jpeg"
+	_ "image/png"
+	"io"
 )
 
 // var asciiChars = "Ñ@#W$9876543210?!abc;:+=-,._           "
-var asciiChars = "@@%#*+=-:.  "
-func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run main.go <image path>")
-		return
-	}
+var asciiChars = "@@%#*+=-:.   "
 
-	openFile, err := os.Open(os.Args[len(os.Args)-1])
-	if err != nil {
-		fmt.Println("Error while opening file: ", err.Error())
-		return
-	}
+//var asciiChars = "@&%QNW0gB#$DR8mHKAUbOGp4d9hPkqswE2]ayjz/?c*F)J7(Ltv1If{C}r;><=^,':.-` "
 
-	img, _, err := image.Decode(openFile)
+func ImageToASCII(file io.Reader) {
+	img, _, err := image.Decode(file)
 	if err != nil {
 		fmt.Println("Error while decoding image: ", err.Error())
 		return
 	}
-
 	max := img.Bounds().Max
-	scaleX, scaleY := 30, 12
+	scaleX, scaleY := 4,2
 	for y := 0; y < max.Y; y += scaleX {
 		for x := 0; x < max.X; x += scaleY {
 			c := AveragePixel(img, x, y, scaleX, scaleY)
