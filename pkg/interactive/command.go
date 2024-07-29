@@ -1,10 +1,11 @@
-package interactive 
+package interactive
 
 const (
 	EXIT    = "EXIT"
 	HELP    = "HELP"
 	CONVERT = "CONVERT"
 	VAL     = "VAL"
+	EOF     = "EOF"
 )
 
 type CommandType string
@@ -12,12 +13,13 @@ type CommandType string
 type Command struct {
 	Type    CommandType
 	Literal string
+	Value   int
 }
 
 var commands = map[string]CommandType{
-	EXIT:    "exit",
-	HELP:    "help",
-	CONVERT: "convert",
+	"exit":    EXIT,
+	"help":    HELP,
+	"convert": CONVERT,
 }
 
 func lookUpCommand(cmd string) CommandType {
