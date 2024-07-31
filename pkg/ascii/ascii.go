@@ -9,15 +9,14 @@ import (
 	"io"
 )
 
-func ImageToASCII(file io.Reader) {
-	config := DefaultConfig()
+func ImageToASCII(file io.Reader, config *ConfigASCII) {
 	img, _, err := image.Decode(file)
 	if err != nil {
 		fmt.Println("Error while decoding image: ", err.Error())
 		return
 	}
 	max := img.Bounds().Max
-	scaleX, scaleY := config.ScaleX, config.ScaleY
+	scaleX, scaleY := config.scaleX, config.scaleY
 	for y := 0; y < max.Y; y += scaleX {
 		for x := 0; x < max.X; x += scaleY {
 			c := AveragePixel(img, x, y, scaleX, scaleY, config)
@@ -30,9 +29,9 @@ func ImageToASCII(file io.Reader) {
 func Grayscale(color color.Color, cfg *ConfigASCII) int {
 	r, g, b, _ := color.RGBA()
 
-	r = uint32(float32(r) * cfg.Brightness)
-	g = uint32(float32(g) * cfg.Brightness)
-	b = uint32(float32(b) * cfg.Brightness)
+	r = uint32(float32(r) * cfg.brightness)
+	g = uint32(float32(g) * cfg.brightness)
+	b = uint32(float32(b) * cfg.brightness)
 
 	if r > 65536 {
 		r = 65536
@@ -59,8 +58,8 @@ func AveragePixel(img image.Image, x, y, w, h int, cfg *ConfigASCII) int {
 }
 
 func grayToASCII(gray int, cfg *ConfigASCII) string {
-	levels := len(cfg.LetterSet)
-	return string(cfg.LetterSet[(gray*int(levels-1))/65536])
+	levels := len(cfg.letterSet)
+	return string(cfg.letterSet[(gray*int(levels-1))/65536])
 }
 
 func clamp(x float64) uint8 {
