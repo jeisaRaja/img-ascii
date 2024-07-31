@@ -7,12 +7,13 @@ import (
 	"github.com/jeisaraja/img-ascii/pkg/ascii"
 )
 
-func NormalMode() {
-	openFile, err := os.Open(os.Args[len(os.Args)-1])
+func Start(config *ascii.ConfigASCII) {
+
+	openFile, err := os.Open(config.Filepath)
 	if err != nil {
-		fmt.Println("Error while opening file: ", err.Error())
+		fmt.Println("error while opening image, ", err.Error())
 		return
 	}
 
-	ascii.ImageToASCII(openFile)
+	ascii.ImageToASCII(openFile, config)
 }

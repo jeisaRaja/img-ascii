@@ -2,22 +2,25 @@ package interactive
 
 import (
 	"bufio"
-	"errors"
-	"fmt"
 	"image"
 	"io"
 )
 
-var ErrExit = errors.New("exit")
-
 type InteractiveProgram struct {
-	scanner *bufio.Scanner
-	input   string
-	out     io.Writer
-	img     image.Image
-	cur     int
-	next    int
-	ch      byte
+	scanner  *bufio.Scanner
+	input    string
+	out      io.Writer
+	img      image.Image
+	cur      int
+	next     int
+	ch       byte
+	commands *[]CommandStatement
+	errs     *[]string
+}
+
+type CommandStatement struct {
+	Command Command
+	Value   float32
 }
 
 const PROMPT = ">> "
@@ -29,7 +32,6 @@ func Start(in io.Reader, out io.Writer) {
 	ip.Print("Welcome to interactive mode, type help for more info.")
 	ip.Print("\n")
 	ip.Print(PROMPT)
-
 	ip.HandleCommand()
 }
 
@@ -44,7 +46,11 @@ func (ip *InteractiveProgram) HandleCommand() {
 
 		parsedLine := ip.parseLine()
 		for _, item := range parsedLine {
-			fmt.Println("item is ", item)
+			switch item.Type {
+			case EXIT:
+				ip.Print("exiting", "\n")
+				return
+			}
 		}
 		ip.Print("input line ", line, "\n")
 		ip.Print(PROMPT)
@@ -64,9 +70,25 @@ func (ip *InteractiveProgram) NextToken() Command {
 			cmd.Literal = ip.readCommand()
 			cmd.Type = lookUpCommand(cmd.Literal)
 			return cmd
+		} else if isNumber(ip.ch) {
+			cmd.Type = VAL
+			cmd.Literal = ip.readNumber()
+			return cmd
 		}
 	}
 	return cmd
+}
+
+func (ip *InteractiveProgram) readNumber() string {
+	position := ip.cur
+	for isNumber(ip.ch) {
+		ip.readChar()
+	}
+	return ip.input[position:ip.cur]
+}
+
+func isNumber(ch byte) bool {
+	return '0' <= ch && ch <= '9'
 }
 
 func (ip *InteractiveProgram) Print(lines ...string) {

@@ -6,6 +6,7 @@ const (
 	CONVERT = "CONVERT"
 	VAL     = "VAL"
 	EOF     = "EOF"
+	INVALID = "INVALID"
 )
 
 type CommandType string
@@ -13,7 +14,6 @@ type CommandType string
 type Command struct {
 	Type    CommandType
 	Literal string
-	Value   int
 }
 
 var commands = map[string]CommandType{
@@ -26,5 +26,5 @@ func lookUpCommand(cmd string) CommandType {
 	if command, ok := commands[cmd]; ok {
 		return command
 	}
-	return VAL
+	return INVALID
 }
